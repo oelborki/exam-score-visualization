@@ -1,38 +1,79 @@
-.App {
-  text-align: center;
+body {
+  font-family: Arial, sans-serif;
+  background: #f7f7f7;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+h1 {
+  margin-bottom: 0.5rem;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.chart-card {
+  background: white;
+  padding: 20px;
+  margin: 30px 0;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.chart-card h2 {
+  margin-bottom: 10px;
+}
+
+select {
+  margin: 10px 0 20px;
+  padding: 6px 10px;
+  font-size: 14px;
+}
+
+.bar {
+  fill: steelblue;
+}
+
+.bar:hover {
+  fill: #ff7f0e;
+}
+
+.tooltip {
+  background: white;
+  border: 1px solid #ccc;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(420px, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.chart-card {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 16px 18px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  max-width: 1000px;
+  height: 520px;
+}
+
+.chart-card h2 {
+  margin-bottom: 6px;
+}
+
+.chart-content {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  align-items: flex-start;
+  gap: 24px;
 }
 
-.App-link {
-  color: #61dafb;
+.chart-vis {
+  flex: 0 0 auto;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.chart-story {
+  flex: 1;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #444;
 }
