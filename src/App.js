@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ScoreHistogram from "./charts/ScoreHistogram";
 import StudyVsScoreScatter from "./charts/StudyVsScore";
 import SleepHabitsBar from "./charts/SleepVsScore";
@@ -9,9 +9,15 @@ import "./App.css";
 function App() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Chart controls
   const [sleepMode, setSleepMode] = useState("quality");
   const [factor, setFactor] = useState("internet_access");
-  const [effortX, setEffortX] = useState("study_hours");
+  const [xField, setXField] = useState("study_hours");
+
+  // View controls
+  const [view, setView] = useState("dashboard"); // "dashboard" | "single"
+  const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
     d3.csv("/Exam_Score_Prediction.csv").then(csvData => {
@@ -39,110 +45,91 @@ function App() {
     });
   }, []);
 
-  if (loading) {
-    return <div>Loading data...</div>;
-  }
-
-  return (
-    <div className="dashboard-grid">
-
-      {/* Chart 1 */}
-      <div className="chart-card">
-        <h2>Exam Score Distribution</h2>
-        <div className="chart-content">
-          <div className="chart-viz">
-            <ScoreHistogram data={data} binsCount={12} />
-          </div>
-          <div className="chart-story">
-            <p>
-              Exam scores are broadly distributed, with most students scoring in the
-              mid-range. This suggests a mix of preparedness levels across the population
-              rather than extreme outcomes.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Chart 2 */}
-      <div className="chart-card">
-        <h2>Student Engagement vs Exam Performance</h2>
-
-        <label style={{ fontSize: 14 }}>
-          Compare by{" "}
-          <select value={effortX} onChange={e => setEffortX(e.target.value)}>
-            <option value="study_hours">Study Hours</option>
-            <option value="class_attendance">Class Attendance</option>
-          </select>
-        </label>
-
-        <div className="chart-content">
-          <div className="chart-viz">
-            <StudyVsScoreScatter data={data} xField={effortX} />
-          </div>
-
-          <div className="chart-story">
-            {effortX === "study_hours" && (
+  const charts = useMemo(() => {
+    return [
+      {
+        key: "c1",
+        title: "Exam Score Distribution",
+        controls: null,
+        viz: <ScoreHistogram data={data} binsCount={12} />,
+        story: (
+          <p>
+            Exam scores are broadly distributed, with most students scoring in the
+            mid-range. This suggests a mix of preparedness levels across the population
+            rather than extreme outcomes.
+          </p>
+        ),
+      },
+      {
+        key: "c2",
+        title: "Student Engagement vs Exam Performance",
+        controls: (
+          <label style={{ fontSize: 14 }}>
+            Compare by{" "}
+            <select value={xField} onChange={e => setXField(e.target.value)}>
+              <option value="study_hours">Study Hours</option>
+              <option value="class_attendance">Class Attendance</option>
+            </select>
+          </label>
+        ),
+        viz: <StudyVsScoreScatter data={data} xField={xField} />,
+        story: (
+          <>
+            {xField === "study_hours" && (
               <p>
                 Students who spend more time studying generally achieve higher exam scores.
                 While individual variation exists, the overall upward trend highlights the
                 impact of sustained study effort.
               </p>
             )}
-
-            {effortX === "class_attendance" && (
+            {xField === "class_attendance" && (
               <p>
                 Class attendance shows limited impact on exam performance on its own.
-                This suggests that simply being present in class is not sufficient to improve 
-                scores unless it is paired with active studying and engagement outside the 
+                This suggests that simply being present in class is not sufficient to improve
+                scores unless it is paired with active studying and engagement outside the
                 classroom.
               </p>
             )}
-          </div>
-        </div>
-      </div>
-
-      {/* Chart 3 */}
-      <div className="chart-card">
-        <h2>Sleep Habits vs Exam Score</h2>
-
-        <label style={{ fontSize: 14 }}>
-          Compare by{" "}
-          <select value={sleepMode} onChange={e => setSleepMode(e.target.value)}>
-            <option value="quality">Sleep Quality</option>
-            <option value="hours">Sleep Hours</option>
-          </select>
-        </label>
-
-        <div className="chart-content">
-          <div className="chart-viz">
-            <SleepHabitsBar data={data} mode={sleepMode} />
-          </div>
-          <div className="chart-story">
-            <p>
-              Students reporting better sleep quality or healthier sleep durations tend to
-              perform better on exams. This highlights sleep as an important contributor
-              to academic success.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Chart 4 */}
-      <div className="chart-card">
-        <h2>Learning Resources & Study Context</h2>
-        <label style={{ fontSize: 14 }}>
-          Compare by{" "}
-          <select value={factor} onChange={e => setFactor(e.target.value)}>
-            <option value="internet_access">Internet Access</option>
-            <option value="study_method">Study Method</option>
-            <option value="facility_rating">Facility Rating</option>
-          </select>
-        </label>
-        <div className="chart-content">
-          <div className="chart-viz">
-            <AccessFactorsBar data={data} factor={factor} />
-          </div>
-          <div className="chart-story">
+          </>
+        ),
+      },
+      {
+        key: "c3",
+        title: "Sleep Habits vs Exam Score",
+        controls: (
+          <label style={{ fontSize: 14 }}>
+            Compare by{" "}
+            <select value={sleepMode} onChange={e => setSleepMode(e.target.value)}>
+              <option value="quality">Sleep Quality</option>
+              <option value="hours">Sleep Hours</option>
+            </select>
+          </label>
+        ),
+        viz: <SleepHabitsBar data={data} mode={sleepMode} />,
+        story: (
+          <p>
+            Students reporting better sleep quality or healthier sleep durations tend to
+            perform better on exams. This highlights sleep as an important contributor
+            to academic success.
+          </p>
+        ),
+      },
+      {
+        key: "c4",
+        title: "Learning Resources & Study Context",
+        controls: (
+          <label style={{ fontSize: 14 }}>
+            Compare by{" "}
+            <select value={factor} onChange={e => setFactor(e.target.value)}>
+              <option value="internet_access">Internet Access</option>
+              <option value="study_method">Study Method</option>
+              <option value="facility_rating">Facility Rating</option>
+            </select>
+          </label>
+        ),
+        viz: <AccessFactorsBar data={data} factor={factor} />,
+        story: (
+          <>
             {factor === "internet_access" && (
               <p>
                 Students with reliable internet access tend to achieve the same exam scores as
@@ -164,10 +151,92 @@ function App() {
                 indicating that learning environments can meaningfully influence student success.
               </p>
             )}
+          </>
+        ),
+      },
+    ];
+  }, [data, xField, sleepMode, factor]);
+
+  const openSingle = index => {
+    setActiveIndex(index);
+    setView("single");
+  };
+
+  const nextChart = () => setActiveIndex(i => (i + 1) % charts.length);
+  const prevChart = () => setActiveIndex(i => (i - 1 + charts.length) % charts.length);
+
+  if (loading) return <div>Loading data...</div>;
+
+  const Active = charts[activeIndex];
+
+  return (
+    <div style={{ padding: "20px" }}>
+      <h1>Exam Score Prediction Visual Story</h1>
+      <p>
+        This dashboard explores how engagement, sleep habits, and access to resources influence
+        student exam performance.
+      </p>
+
+      {view === "dashboard" && (
+        <div className="dashboard-grid">
+          {charts.map((c, idx) => (
+            <div
+              key={c.key}
+              className="chart-card"
+              onClick={() => openSingle(idx)}
+              style={{ cursor: "pointer" }}
+              title="Click to focus on this chart"
+            >
+              <h2>{c.title}</h2>
+
+              {c.controls && (
+                <div
+                  style={{ display: "inline-block", width: "fit-content" }}
+                  onClickCapture={e => e.stopPropagation()}
+                  onMouseDownCapture={e => e.stopPropagation()}
+                >
+                  {c.controls}
+                </div>
+              )}
+
+              <div className="chart-content">
+                <div className="chart-viz">{c.viz}</div>
+                <div className="chart-story">{c.story}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {view === "single" && (
+        <div className="chart-card" style={{ maxWidth: 1100, margin: "0 auto" }}>
+          <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 10 }}>
+            <button onClick={() => setView("dashboard")}>← Full dashboard</button>
+            <button onClick={prevChart}>Prev</button>
+            <button onClick={nextChart}>Next</button>
+            <div style={{ marginLeft: "auto", fontSize: 12, opacity: 0.8 }}>
+              Chart {activeIndex + 1} / {charts.length}
+            </div>
+          </div>
+
+          <h2 style={{ marginTop: 0 }}>{Active.title}</h2>
+
+          {Active.controls && (
+            <div
+              style={{ display: "inline-block", width: "fit-content" }}
+              onClickCapture={e => e.stopPropagation()}
+              onMouseDownCapture={e => e.stopPropagation()}
+            >
+              {Active.controls}
+            </div>
+          )}
+
+          <div className="chart-content">
+            <div className="chart-viz">{Active.viz}</div>
+            <div className="chart-story">{Active.story}</div>
           </div>
         </div>
-      </div>
-
+      )}
     </div>
   );
 }
