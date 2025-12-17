@@ -185,7 +185,6 @@ function App() {
               className="chart-card"
               onClick={() => openSingle(idx)}
               style={{ cursor: "pointer" }}
-              title="Click to focus on this chart"
             >
               <h2>{c.title}</h2>
 
