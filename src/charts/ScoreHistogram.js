@@ -73,7 +73,9 @@ function ScoreHistogram({ data, binsCount = 10 }) {
             .attr("fill", "#69b3a2")
             .on("mousemove", (event, d) => {
                 const [mx, my] = d3.pointer(event);
-                const range = `${d.x0.toFixed(1)} – ${d.x1.toFixed(1)}`;
+                const range = d.x1.toFixed(1) == 100 ?
+                `${d.x0.toFixed(1)} – ${d.x1.toFixed(1)}` :
+                `${d.x0.toFixed(1)} – ${(d.x1 - 1).toFixed(1)}`;
 
                 d3.select(tooltipRef.current)
                     .style("opacity", 1)
