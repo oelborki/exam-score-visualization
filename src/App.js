@@ -62,7 +62,7 @@ function App() {
       },
       {
         key: "c2",
-        title: "Student Engagement vs Exam Performance",
+        title: "Exam Performance vs Student Engagement",
         controls: (
           <label style={{ fontSize: 14 }}>
             Compare by{" "}
@@ -95,7 +95,7 @@ function App() {
       },
       {
         key: "c3",
-        title: "Sleep Habits vs Exam Score",
+        title: "Exam Score vs Sleep Habits",
         controls: (
           <label style={{ fontSize: 14 }}>
             Compare by{" "}
@@ -116,7 +116,7 @@ function App() {
       },
       {
         key: "c4",
-        title: "Learning Resources & Study Context",
+        title: "Exam Score vs Learning Resources & Study Context",
         controls: (
           <label style={{ fontSize: 14 }}>
             Compare by{" "}
