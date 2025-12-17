@@ -11,6 +11,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [sleepMode, setSleepMode] = useState("quality");
   const [factor, setFactor] = useState("internet_access");
+  const [effortX, setEffortX] = useState("study_hours");
 
   useEffect(() => {
     d3.csv("/Exam_Score_Prediction.csv").then(csvData => {
@@ -64,17 +65,38 @@ function App() {
 
       {/* Chart 2 */}
       <div className="chart-card">
-        <h2>Study Hours vs Exam Score</h2>
+        <h2>Student Engagement vs Exam Performance</h2>
+
+        <label style={{ fontSize: 14 }}>
+          Compare by{" "}
+          <select value={effortX} onChange={e => setEffortX(e.target.value)}>
+            <option value="study_hours">Study Hours</option>
+            <option value="class_attendance">Class Attendance</option>
+          </select>
+        </label>
+
         <div className="chart-content">
           <div className="chart-viz">
-            <StudyVsScoreScatter data={data} />
+            <StudyVsScoreScatter data={data} xField={effortX} />
           </div>
+
           <div className="chart-story">
-            <p>
-              Students who spend more time studying generally achieve higher exam scores.
-              While individual variation exists, the overall upward trend highlights the
-              positive impact of sustained study effort.
-            </p>
+            {effortX === "study_hours" && (
+              <p>
+                Students who spend more time studying generally achieve higher exam scores.
+                While individual variation exists, the overall upward trend highlights the
+                impact of sustained study effort.
+              </p>
+            )}
+
+            {effortX === "class_attendance" && (
+              <p>
+                Class attendance shows limited impact on exam performance on its own.
+                This suggests that simply being present in class is not sufficient to improve 
+                scores unless it is paired with active studying and engagement outside the 
+                classroom.
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -148,8 +170,6 @@ function App() {
 
     </div>
   );
-
-
 }
 
 export default App;

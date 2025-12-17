@@ -1,14 +1,19 @@
 import * as d3 from "d3";
 import { useEffect, useMemo, useRef } from "react";
 
-function StudyHoursScatter({ data, sampleSize = 1000 }) {
+function StudyHoursScatter({ data, sampleSize = 1000, xField = "study_hours" }) {
     const ref = useRef();
+
+    const xMeta = useMemo(() => {
+        // label shown on axis + tooltip
+        if (xField === "class_attendance") return { label: "Class Attendance (%)", key: "class_attendance" };
+        return { label: "Study Hours", key: "study_hours" };
+    }, [xField]);
 
     // sample a subset to reduce clutter
     const sampled = useMemo(() => {
         if (!data?.length) return [];
         const n = Math.min(sampleSize, data.length);
-        // d3.shuffle copies array, shuffles, then slice
         return d3.shuffle([...data]).slice(0, n);
     }, [data, sampleSize]);
 
@@ -20,7 +25,7 @@ function StudyHoursScatter({ data, sampleSize = 1000 }) {
 
         // layout
         const width = 700;
-        const height = 420;
+        const height = 370;
         const legendWidth = 160;
         const margin = { top: 20, right: 20 + legendWidth, bottom: 60, left: 70 };
 
@@ -29,14 +34,12 @@ function StudyHoursScatter({ data, sampleSize = 1000 }) {
         const plotW = width - margin.left - margin.right;
         const plotH = height - margin.top - margin.bottom;
 
-        const g = svg
-            .append("g")
-            .attr("transform", `translate(${margin.left},${margin.top})`);
+        const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
         // scales
         const x = d3
             .scaleLinear()
-            .domain(d3.extent(sampled, d => d.study_hours))
+            .domain(d3.extent(sampled, d => +d[xMeta.key]))
             .nice()
             .range([0, plotW]);
 
@@ -63,7 +66,7 @@ function StudyHoursScatter({ data, sampleSize = 1000 }) {
             .attr("y", height - 15)
             .attr("text-anchor", "middle")
             .style("font-size", "12px")
-            .text("Study Hours");
+            .text(xMeta.label);
 
         svg.append("text")
             .attr("transform", "rotate(-90)")
@@ -95,7 +98,7 @@ function StudyHoursScatter({ data, sampleSize = 1000 }) {
             .data(sampled)
             .enter()
             .append("circle")
-            .attr("cx", d => x(d.study_hours))
+            .attr("cx", d => x(+d[xMeta.key]))
             .attr("cy", d => y(d.exam_score))
             .attr("r", 3)
             .attr("fill", d => color(d.exam_difficulty))
@@ -104,22 +107,20 @@ function StudyHoursScatter({ data, sampleSize = 1000 }) {
                 tooltip
                     .style("opacity", 1)
                     .html(
-                        `<div><b>Study Hours:</b> ${d.study_hours}</div>
+                        `<div><b>${xMeta.label}:</b> ${(+d[xMeta.key]).toFixed(2)}</div>
              <div><b>Exam Score:</b> ${d.exam_score}</div>
              <div><b>Difficulty:</b> ${d.exam_difficulty}</div>`
                     )
                     .style("left", `${event.offsetX + 20}px`)
                     .style("top", `${event.offsetY}px`);
             })
-            .on("mouseleave", () => {
-                tooltip.style("opacity", 0);
-            });
+            .on("mouseleave", () => tooltip.style("opacity", 0));
 
+        // legend
         const legendX = margin.left + plotW + 30;
         const legendY = margin.top;
 
-        const legend = svg.append("g")
-            .attr("transform", `translate(${legendX}, ${legendY})`);
+        const legend = svg.append("g").attr("transform", `translate(${legendX}, ${legendY})`);
 
         legend.append("text")
             .attr("x", 0)
@@ -133,7 +134,7 @@ function StudyHoursScatter({ data, sampleSize = 1000 }) {
             row.append("rect").attr("width", 10).attr("height", 10).attr("fill", color(k));
             row.append("text").attr("x", 14).attr("y", 9).style("font-size", "12px").text(k);
         });
-    }, [sampled]);
+    }, [sampled, xMeta]);
 
     return (
         <div style={{ position: "relative" }}>
