@@ -75,7 +75,7 @@ function ScoreHistogram({ data, binsCount = 10 }) {
                 const [mx, my] = d3.pointer(event);
                 const range = d.x1.toFixed(1) == 100 ?
                 `${d.x0.toFixed(1)} – ${d.x1.toFixed(1)}` :
-                `${d.x0.toFixed(1)} – ${(d.x1 - 1).toFixed(1)}`;
+                `${d.x0.toFixed(1)} – ${(d.x1 - 0.01).toFixed(2)}`;
 
                 d3.select(tooltipRef.current)
                     .style("opacity", 1)
