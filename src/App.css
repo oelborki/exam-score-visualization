@@ -46,6 +46,7 @@ select {
   grid-template-columns: repeat(2, minmax(420px, 1fr));
   gap: 20px;
   align-items: start;
+  width:1940px;
 }
 
 .chart-card {
@@ -53,7 +54,7 @@ select {
   border-radius: 10px;
   padding: 16px 18px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  max-width: 1000px;
+  width: 850px;
   height: 520px;
   cursor: pointer;
 }
