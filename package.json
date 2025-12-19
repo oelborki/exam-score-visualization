@@ -19,7 +19,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "predeploy": "npm run build",
+    "predeploy": "npm run build && copy public\\Exam_Score_Prediction.csv build\\Exam_Score_Prediction.csv",
     "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
