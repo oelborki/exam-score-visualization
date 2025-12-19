@@ -20,7 +20,7 @@ function App() {
   const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
-    d3.csv("/Exam_Score_Prediction.csv").then(csvData => {
+    d3.csv(`${process.env.PUBLIC_URL}/Exam_Score_Prediction.csv`).then(csvData => {
       const cleanedData = csvData.map(d => ({
         student_id: +d.student_id,
         age: +d.age,
