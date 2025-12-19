@@ -5,6 +5,7 @@ import StudyVsScoreScatter from "./charts/StudyVsScore";
 import SleepHabitsBar from "./charts/SleepVsScore";
 import AccessFactorsBar from "./charts/ResourcesVsScore";
 import "./App.css";
+import csvUrl from "./assets/Exam_Score_Prediction.csv";
 
 function App() {
   const [data, setData] = useState([]);
@@ -20,10 +21,9 @@ function App() {
   const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
-    const url = `${process.env.PUBLIC_URL}/Exam_Score_Prediction.csv`;
-    console.log("CSV URL:", url);
+    console.log("CSV URL (bundled):", csvUrl);
 
-    d3.csv(url)
+    d3.csv(csvUrl)
       .then(csvData => {
         console.log("Rows loaded:", csvData.length);
         const cleanedData = csvData.map(d => ({
