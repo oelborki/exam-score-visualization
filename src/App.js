@@ -20,30 +20,36 @@ function App() {
   const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
-    d3.csv(`${process.env.PUBLIC_URL}/Exam_Score_Prediction.csv`).then(csvData => {
-      const cleanedData = csvData.map(d => ({
-        student_id: +d.student_id,
-        age: +d.age,
-        gender: d.gender,
-        course: d.course,
-        study_hours: +d.study_hours,
-        class_attendance: +d.class_attendance,
-        internet_access: d.internet_access,
-        sleep_hours: +d.sleep_hours,
-        sleep_quality: d.sleep_quality,
-        study_method: d.study_method,
-        facility_rating: d.facility_rating,
-        exam_difficulty: d.exam_difficulty,
-        exam_score: +d.exam_score,
-      }));
+    const url = `${process.env.PUBLIC_URL}/Exam_Score_Prediction.csv`;
+    console.log("CSV URL:", url);
 
-      console.log("Parsed row example:", cleanedData[0]);
-      console.log("Rows loaded:", cleanedData.length);
-
-      setData(cleanedData);
-      setLoading(false);
-    });
+    d3.csv(url)
+      .then(csvData => {
+        console.log("Rows loaded:", csvData.length);
+        const cleanedData = csvData.map(d => ({
+          student_id: +d.student_id,
+          age: +d.age,
+          gender: d.gender,
+          course: d.course,
+          study_hours: +d.study_hours,
+          class_attendance: +d.class_attendance,
+          internet_access: d.internet_access,
+          sleep_hours: +d.sleep_hours,
+          sleep_quality: d.sleep_quality,
+          study_method: d.study_method,
+          facility_rating: d.facility_rating,
+          exam_difficulty: d.exam_difficulty,
+          exam_score: +d.exam_score,
+        }));
+        setData(cleanedData);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("CSV load failed:", err);
+        setLoading(false);
+      });
   }, []);
+
 
   const charts = useMemo(() => {
     return [
